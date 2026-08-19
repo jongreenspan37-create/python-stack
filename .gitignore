@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+venv/
+.venv/
+postgres-data/
+.vscode/
+.idea/
+.DS_Store

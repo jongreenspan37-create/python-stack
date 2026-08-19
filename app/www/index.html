@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python + PostgreSQL Learning Project</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Python + PostgreSQL — No Framework</h1>
+    <p>Each button imports a script in <code>scripts/</code> and calls the function matching its name.</p>
+    <button data-script="health/health">Check DB Connection</button>
+    <button data-script="create_tables/create_tables">Create Tables</button>
+    <button data-script="test/test_1">Test1</button>
+    <button data-script="test/test_2">Test2</button>
+
+    <h2>Add User</h2>
+    <form id="add-user-form">
+      <input type="text" name="firstName" placeholder="First name" required>
+      <input type="text" name="lastName" placeholder="Last name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <button type="submit">Add User</button>
+    </form>
+
+    <pre id="result"></pre>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
