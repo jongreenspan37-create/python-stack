@@ -1,60 +1,177 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Python + PostgreSQL Learning Project</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <nav>
-    <a href="basic-scripts.html">Basic Scripts</a>
-    <a href="list-manipulation.html">List Manipulation</a>
-  </nav>
-  <main>
-    <h1>Python + PostgreSQL — No Framework</h1>
-    <p>Each button imports a script in <code>scripts/</code> and calls the function matching its name.</p>
-    <button data-script="health/health">Check DB Connection</button>
-    <button data-script="create_tables/create_tables">Create Tables</button>
-    <button data-script="test/test_1">Test1</button>
-    <button data-script="test/test_2">Test2</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Basic Scripts</title>
+    <style>
+      .result-div {
+        margin: 2rem 4rem;
+        font-size: large;
+      }
+    </style>
+    <link src="style.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Main Page</a>
+      <a href="list_manipulation.html">List Manipulation</a>
+      <a href="database-interaction.html">Database Interaction</a>
+    </nav>
+    <h1>Vanilla HTML/CSS/Javascript - Python - Postgres Stack</h1>
+    <form id="add-numbers">
+      <input type="number" step="any" name="x" required />
+      <input type="number" step="any" name="y" required />
+      <input type="number" step="any" name="a" required />
 
-    <h2>Roles</h2>
-    <table id="roles-table">
-      <thead>
-        <tr><th>ID</th><th>Name</th><th></th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <h3>Add / Edit Role</h3>
-    <form id="add-role-form">
-      <input type="text" name="id" placeholder="ID no.." required>
-      <input type="text" name="name" placeholder="Role name ...." required>
-
-      <button type="submit">Add Role</button>
-      <button type="button" id="cancel-role-edit" hidden>Cancel</button>
+      <button type="submit">Add Numbers</button>
     </form>
 
-    <h2>Users</h2>
-    <table id="users-table">
-      <thead>
-        <tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Role</th><th></th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="result-div" id="result-1"></div>
+    <div class="result-div" id="result-2"></div>
+    <div class="result-div" id="result-3"></div>
 
-    <h3>Add / Edit User</h3>
-    <form id="add-user-form">
-      <input type="text" name="firstName" placeholder="First name" required>
-      <input type="text" name="lastName" placeholder="Last name" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <button type="submit">Add User</button>
-      <button type="button" id="cancel-user-edit" hidden>Cancel</button>
+    <form id="add-strings">
+      <input type="text" maxlength="100" name="a" required />
+      <input type="text" maxlength="100" name="b" required />
+      <input type="text" maxlength="100" name="c" required />
+
+      <button type="submit">Add Words</button>
     </form>
 
-    <pre id="result"></pre>
-  </main>
-  <script src="script.js"></script>
-</body>
+    <div class="result-div" id="result-error" style="color: red"></div>
+    <div class="result-div" id="string-error"></div>
+    <div class="result-div" id="string-result"></div>
+
+    <div class="result-div">
+      <button id="add-phrase" data-script="basic/add_phrase">
+        Add a phrase
+      </button>
+      <div class="result-div" style="color: purple" id="display-phrase"></div>
+
+      <div class="result-div" id="slice"></div>
+    </div>
+
+    <script>
+      const addNumbers = document.getElementById("add-numbers");
+      const resultError = document.getElementById("result-error");
+      const result1 = document.getElementById("result-1");
+      const result2 = document.getElementById("result-2");
+      const result3 = document.getElementById("result-3");
+
+      addNumbers.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const form = e.target;
+        resultError.textContent = "";
+        result1.textContent = "";
+        result2.textContent = "";
+        result3.textContent = "";
+
+        const x = Number(form.x.value);
+        const y = Number(form.y.value);
+        const a = Number(form.a.value);
+
+        // Client-side check: fast feedback only, not security.
+        // The backend re-validates because this can be bypassed.
+        if (![x, y, a].every(Number.isFinite)) {
+          resultError.textContent = "x, y, and a must all be valid numbers.";
+          return;
+        }
+
+        fetch("/api/run/basic/add_numbers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ x, y, a }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.error) {
+              resultError.textContent = data.error;
+              return;
+            }
+            result1.textContent = "Result = " + data[0];
+            result2.textContent =
+              "Raw result = " +
+              data +
+              " Extracting parts = " +
+              data[0] +
+              " " +
+              data[1];
+            ///Increased risk !
+            result3.innerHTML = `<div>Temperal literal =  <strong>${data[0]} ${data[1]}</strong></span></div>`;
+          });
+      });
+
+      const addStrings = document.getElementById("add-strings");
+      const stringError = document.getElementById("string-error");
+      const stringResult = document.getElementById("string-result");
+
+      addStrings.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const form = e.target;
+        stringError.textContent = "";
+        stringResult.textContent = "";
+
+        const a = form.a.value.trim();
+        const b = form.b.value.trim();
+        const c = form.c.value.trim();
+
+        // Client-side check: fast feedback only, not security.
+        // The backend re-validates because this can be bypassed.
+        if (![a, b, c].every((v) => v.length > 0 && v.length <= 100)) {
+          stringError.textContent = "Each word must be 1-100 characters.";
+          return;
+        }
+
+        fetch("/api/run/basic/add_strings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ a, b, c }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.error) {
+              stringError.textContent = data.error;
+              return;
+            }
+            // textContent (not innerHTML) is what actually stops XSS here:
+            // the browser renders this as plain text, so tags can't execute.
+            stringResult.textContent = data.result;
+          });
+      });
+
+      const addPhrase = document.getElementById("add-phrase");
+      const displayPhrase = document.getElementById("display-phrase");
+      const displaySlice = document.getElementById("slice");
+
+      addPhrase.addEventListener("click", () => {
+        displayPhrase.textContent = "Fetching ....";
+        fetch("/api/run/basic/add_phrase")
+          .then((res) => res.json())
+          .then((data) => {
+            const phrase = data;
+            displayPhrase.textContent = "'" + phrase + "'";
+
+            if (phrase) {
+              console.log(phrase);
+              return fetch("/api/run/basic/string_func", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(phrase),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log(data);
+                  //Danger using innerHTML
+                  displaySlice.innerHTML = `This is a slice of the phrase 
+                                    <div class='result-div'style='color:purple'> 
+                                        "${data.slice}" </div>  
+                                        and this shows CAPATILISATION of the string 
+                                        <div class='result-div' style='color:purple'>${data.upper}</div>`;
+                });
+            }
+          });
+      });
+    </script>
+  </body>
 </html>

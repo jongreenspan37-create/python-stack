@@ -12,6 +12,11 @@
     </style>
   </head>
   <body>
+    <nav>
+      <a href="index.html">Main Page</a>
+      <a href="list_manipulation.html">Basic Scripts</a>
+      <a href="database-interaction.html">List Manipulation</a>
+    </nav>
     <h1>List manipulation</h1>
 
     <div class="div1">
@@ -111,7 +116,7 @@
       fetch("/api/run/list_manipulation/count_fruit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fruit }),
+        body: JSON.stringify(fruit),
       })
         .then((res) => res.json())
         .then((data) => {

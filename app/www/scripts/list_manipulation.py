@@ -17,6 +17,6 @@ def upload_fruits(body=None):
 
 
 def count_fruit(body):
-    target = body.get("fruit")
+    target = body
     count = sum(1 for row in _read_fruits() if row["fruit"] == target)
     return {"fruit": target, "count": count}
