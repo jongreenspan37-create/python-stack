@@ -30,6 +30,20 @@ const rolesTableBody = document.querySelector("#roles-table tbody");
 const addRoleForm = document.getElementById("add-role-form");
 const cancelRoleEdit = document.getElementById("cancel-role-edit");
 
+const userRoleSelect = document.getElementById("user-role-select");
+
+function populateRoleOptions(roles) {
+  const previousValue = userRoleSelect.value;
+  userRoleSelect.innerHTML = '<option value="">-- No role --</option>';
+  for (const role of roles) {
+    const option = document.createElement("option");
+    option.value = role.id;
+    option.textContent = role.name;
+    userRoleSelect.appendChild(option);
+  }
+  userRoleSelect.value = previousValue;
+}
+
 async function loadRoles() {
   const data = await callScript("role_crud/list_roles");
   if (data.status !== "ok") return;
@@ -47,6 +61,7 @@ async function loadRoles() {
     `;
     rolesTableBody.appendChild(row);
   }
+  populateRoleOptions(data.roles);
 }
 
 function resetRoleForm() {
@@ -124,7 +139,7 @@ async function loadUsers() {
       <td>${user.email}</td>
       <td>${user.roleId ?? ""}</td>
       <td>
-        <button type="button" data-action="edit-user" data-id="${user.id}" data-first-name="${user.firstName}" data-last-name="${user.lastName}" data-email="${user.email}">Edit</button>
+        <button type="button" data-action="edit-user" data-id="${user.id}" data-first-name="${user.firstName}" data-last-name="${user.lastName}" data-email="${user.email}" data-role-id="${user.roleId ?? ""}">Edit</button>
         <button type="button" data-action="delete-user" data-id="${user.id}">Delete</button>
       </td>
     `;
@@ -156,6 +171,7 @@ usersTableBody.addEventListener("click", async (event) => {
     addUserForm.firstName.value = button.dataset.firstName;
     addUserForm.lastName.value = button.dataset.lastName;
     addUserForm.email.value = button.dataset.email;
+    addUserForm.roleId.value = button.dataset.roleId;
     addUserForm.querySelector("button[type=submit]").textContent = "Update User";
     cancelUserEdit.hidden = false;
   }
@@ -171,6 +187,7 @@ addUserForm.addEventListener("submit", async (event) => {
     firstName: form.firstName.value,
     lastName: form.lastName.value,
     email: form.email.value,
+    roleId: form.roleId.value || null,
   };
   if (editingId) body.id = editingId;
 

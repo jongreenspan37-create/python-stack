@@ -34,7 +34,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def handle_run(self, body):
         name = self.path.removeprefix("/api/run/")
-        payload = router.run_script(name, body)
+        try:
+            payload = router.run_script(name, body)
+        except Exception as e:
+            self.send_json(500, {"error": str(e)})
+            return
         self.send_json(200, payload)
 
     def handle_static(self):

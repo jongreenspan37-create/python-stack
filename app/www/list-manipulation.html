@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>List Manipulation</title>
+    <link rel="stylesheet" href="style.css" />
     <style>
       .div1 {
         display: flex;
@@ -14,8 +15,8 @@
   <body>
     <nav>
       <a href="index.html">Main Page</a>
-      <a href="list_manipulation.html">Basic Scripts</a>
-      <a href="database-interaction.html">List Manipulation</a>
+      <a href="list-manipulation.html">List Manipulation</a>
+      <a href="database-interaction.html">Database Interaction</a>
     </nav>
     <h1>List manipulation</h1>
 
@@ -57,26 +58,40 @@
     const addTable = document.getElementById("add-table");
     const fruitList = document.getElementById("fruit-list");
     const fruitTableBody = document.getElementById("fruit-table-body");
+    const fruitError = document.getElementById("fruit-error");
 
     //uses forEach no new array just display
     addList.addEventListener("click", () => {
+      fruitError.textContent = "";
       fetch("/api/run/list_manipulation/upload_fruits")
         .then((res) => res.json())
         .then((data) => {
+          if (data.error) {
+            fruitError.textContent = data.error;
+            return;
+          }
           fruitList.textContent = "";
           data.forEach((fruitItem) => {
             const li = document.createElement("li");
             li.textContent = `${fruitItem.id} - ${fruitItem.fruit};`;
             fruitList.appendChild(li);
           });
+        })
+        .catch(() => {
+          fruitError.textContent = "Could not load fruits.";
         });
     });
 
     //uses .map() create new array
     addTable.addEventListener("click", () => {
+      fruitError.textContent = "";
       fetch("/api/run/list_manipulation/upload_fruits")
         .then((res) => res.json())
         .then((data) => {
+          if (data.error) {
+            fruitError.textContent = data.error;
+            return;
+          }
           fruitTableBody.textContent = "";
           const rows = data.map((fruitItem) => {
             const tr = document.createElement("tr");
@@ -91,11 +106,13 @@
             return tr;
           });
           fruitTableBody.append(...rows);
+        })
+        .catch(() => {
+          fruitError.textContent = "Could not load fruits.";
         });
     });
 
     const countFruit = document.getElementById("count-fruit");
-    const fruitError = document.getElementById("fruit-error");
     const fruitResult = document.getElementById("fruit-result");
 
     countFruit.addEventListener("submit", (e) => {
