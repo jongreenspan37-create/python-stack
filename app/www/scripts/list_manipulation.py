@@ -1,22 +1,26 @@
-import csv
-import os
+from scripts.get_csv import _read_fruits
 
-
-def _fruits_csv_path():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, "csv", "fruits.csv")
-
-
-def _read_fruits():
-    with open(_fruits_csv_path(), mode="r", encoding="utf-8") as file:
-        return list(csv.DictReader(file))
 
 
 def upload_fruits(body=None):
-    return _read_fruits()
+    try:
+        fruits = _read_fruits()
+    except FileNotFoundError:
+        return {"error": "fruits.csv not found"}
+    if not fruits:
+        return {"error": "no fruits found"}
+    return fruits
 
 
 def count_fruit(body):
-    target = body
-    count = sum(1 for row in _read_fruits() if row["fruit"] == target)
+
+    try:
+        target = body
+        fruits = _read_fruits()
+        count = sum(1 for row in fruits if row["fruit"] == target)
+    except FileNotFoundError:
+        return {"error": "fruits.csv not found"}
+    if count == 0:
+        return {"error": f'{target} not found'}
+
     return {"fruit": target, "count": count}

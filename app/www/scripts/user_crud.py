@@ -8,6 +8,7 @@ def add_user(body):
     first_name = body.get("firstName")
     last_name = body.get("lastName")
     email = body.get("email")
+    role_id = body.get("roleId") or None
 
     if not first_name or not last_name or not email:
         return {"status": "error", "detail": "firstName, lastName and email are required"}
@@ -18,8 +19,8 @@ def add_user(body):
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO users (FirstName, LastName, email) VALUES (%s, %s, %s) RETURNING id;",
-            (first_name, last_name, email),
+            "INSERT INTO users (FirstName, LastName, email, role_id) VALUES (%s, %s, %s, %s) RETURNING id;",
+            (first_name, last_name, email, role_id),
         )
         new_id = cur.fetchone()[0]
         conn.commit()
@@ -63,6 +64,7 @@ def update_user(body):
     first_name = body.get("firstName")
     last_name = body.get("lastName")
     email = body.get("email")
+    role_id = body.get("roleId") or None
 
     if not user_id or not first_name or not last_name or not email:
         return {"status": "error", "detail": "id, firstName, lastName and email are required"}
@@ -73,8 +75,8 @@ def update_user(body):
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(
-            "UPDATE users SET FirstName = %s, LastName = %s, email = %s WHERE id = %s;",
-            (first_name, last_name, email, user_id),
+            "UPDATE users SET FirstName = %s, LastName = %s, email = %s, role_id = %s WHERE id = %s;",
+            (first_name, last_name, email, role_id, user_id),
         )
         conn.commit()
         return {"status": "ok"}
