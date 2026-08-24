@@ -1,5 +1,7 @@
 from connection import get_connection
 
+MAX_FIELD_LENGTH = 25
+
 
 def add_role(body):
     if not body:
@@ -10,6 +12,9 @@ def add_role(body):
 
     if not id or not name:
         return {"status": "error", "detail": "id and name are required"}
+
+    if len(str(name)) > MAX_FIELD_LENGTH:
+        return {"status": "error", "detail": f"name must be {MAX_FIELD_LENGTH} characters or fewer"}
 
     conn = None
     cur = None
@@ -59,6 +64,9 @@ def update_role(body):
 
     if not id or not name:
         return {"status": "error", "detail": "id and name are required"}
+
+    if len(str(name)) > MAX_FIELD_LENGTH:
+        return {"status": "error", "detail": f"name must be {MAX_FIELD_LENGTH} characters or fewer"}
 
     conn = None
     cur = None
