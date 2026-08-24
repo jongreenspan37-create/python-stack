@@ -24,3 +24,11 @@ def count_fruit(body):
         return {"error": f'{target} not found'}
 
     return {"fruit": target, "count": count}
+
+def prepare_data(fruits):
+    prepared =[]
+    for fruit in fruits:
+        prepared.append({
+            "description":fruit["fruit"] + " is a fruit"
+        })
+    return prepared

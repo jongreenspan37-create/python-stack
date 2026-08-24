@@ -52,6 +52,14 @@
         <div class="result-div" id="fruit-result"></div>
       </div>
     </div>
+
+    <div>
+      <div>
+        <button type="button" id="prepare-data">Prepare Data</button>
+      </div>
+      <div class="result-div" id="prepare-error" style="color: red"></div>
+      <ul id="prepare-list"></ul>
+    </div>
   </body>
   <script>
     const addList = document.getElementById("add-list");
@@ -142,6 +150,43 @@
             return;
           }
           fruitResult.textContent = `${data.fruit}: ${data.count}`;
+        });
+    });
+
+    const prepareData = document.getElementById("prepare-data");
+    const prepareList = document.getElementById("prepare-list");
+    const prepareError = document.getElementById("prepare-error");
+
+    prepareData.addEventListener("click", () => {
+      prepareError.textContent = "";
+      fetch("/api/run/list_manipulation/upload_fruits")
+        .then((res) => res.json())
+        .then((fruits) => {
+          if (fruits.error) {
+            prepareError.textContent = fruits.error;
+            return;
+          }
+          return fetch("/api/run/list_manipulation/prepare_data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(fruits),
+          }).then((res) => res.json());
+        })
+        .then((data) => {
+          if (!data) return;
+          if (data.error) {
+            prepareError.textContent = data.error;
+            return;
+          }
+          prepareList.textContent = "";
+          data.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item.description;
+            prepareList.appendChild(li);
+          });
+        })
+        .catch(() => {
+          prepareError.textContent = "Could not prepare data.";
         });
     });
   </script>
