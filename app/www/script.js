@@ -1,12 +1,21 @@
 const result = document.getElementById("result");
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 document.querySelectorAll("button[data-script]").forEach((button) => {
   button.addEventListener("click", async () => {
     const name = button.dataset.script;
     result.textContent = `Running ${name}...`;
     try {
       const res = await fetch(`/api/run/${name}`);
-      console.log(`/api/run/${name}`)
+
       const data = await res.json();
 
       result.textContent = JSON.stringify(data, null, 2);
@@ -18,7 +27,11 @@ document.querySelectorAll("button[data-script]").forEach((button) => {
 
 async function callScript(name, body) {
   const options = body
-    ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
+    ? {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
     : {};
   const res = await fetch(`/api/run/${name}`, options);
   return res.json();
@@ -52,11 +65,11 @@ async function loadRoles() {
   for (const role of data.roles) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${role.id}</td>
-      <td>${role.name}</td>
+      <td>${escapeHtml(role.id)}</td>
+      <td>${escapeHtml(role.name)}</td>
       <td>
-        <button type="button" data-action="edit-role" data-id="${role.id}" data-name="${role.name}">Edit</button>
-        <button type="button" data-action="delete-role" data-id="${role.id}">Delete</button>
+        <button type="button" data-action="edit-role" data-id="${escapeHtml(role.id)}" data-name="${escapeHtml(role.name)}">Edit</button>
+        <button type="button" data-action="delete-role" data-id="${escapeHtml(role.id)}">Delete</button>
       </td>
     `;
     rolesTableBody.appendChild(row);
@@ -89,7 +102,8 @@ rolesTableBody.addEventListener("click", async (event) => {
     addRoleForm.id.value = id;
     addRoleForm.id.disabled = true;
     addRoleForm.name.value = button.dataset.name;
-    addRoleForm.querySelector("button[type=submit]").textContent = "Update Role";
+    addRoleForm.querySelector("button[type=submit]").textContent =
+      "Update Role";
     cancelRoleEdit.hidden = false;
   }
 });
@@ -133,14 +147,14 @@ async function loadUsers() {
   for (const user of data.users) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${user.id}</td>
-      <td>${user.firstName}</td>
-      <td>${user.lastName}</td>
-      <td>${user.email}</td>
-      <td>${user.roleId ?? ""}</td>
+      <td>${escapeHtml(user.id)}</td>
+      <td>${escapeHtml(user.firstName)}</td>
+      <td>${escapeHtml(user.lastName)}</td>
+      <td>${escapeHtml(user.email)}</td>
+      <td>${escapeHtml(user.roleName ?? "")}</td>
       <td>
-        <button type="button" data-action="edit-user" data-id="${user.id}" data-first-name="${user.firstName}" data-last-name="${user.lastName}" data-email="${user.email}" data-role-id="${user.roleId ?? ""}">Edit</button>
-        <button type="button" data-action="delete-user" data-id="${user.id}">Delete</button>
+        <button type="button" data-action="edit-user" data-id="${escapeHtml(user.id)}" data-first-name="${escapeHtml(user.firstName)}" data-last-name="${escapeHtml(user.lastName)}" data-email="${escapeHtml(user.email)}" data-role-id="${escapeHtml(user.roleId ?? "")}">Edit</button>
+        <button type="button" data-action="delete-user" data-id="${escapeHtml(user.id)}">Delete</button>
       </td>
     `;
     usersTableBody.appendChild(row);
@@ -172,7 +186,8 @@ usersTableBody.addEventListener("click", async (event) => {
     addUserForm.lastName.value = button.dataset.lastName;
     addUserForm.email.value = button.dataset.email;
     addUserForm.roleId.value = button.dataset.roleId;
-    addUserForm.querySelector("button[type=submit]").textContent = "Update User";
+    addUserForm.querySelector("button[type=submit]").textContent =
+      "Update User";
     cancelUserEdit.hidden = false;
   }
 });

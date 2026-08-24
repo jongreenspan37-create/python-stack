@@ -1,5 +1,8 @@
 import json
 import mimetypes
+import threading
+import time
+from collections import defaultdict, deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -7,10 +10,40 @@ import router
 
 STATIC_DIR = Path(__file__).parent.resolve()
 
+RATE_LIMIT_WINDOW_SECONDS = 10
+RATE_LIMIT_MAX_REQUESTS = 20
+MAX_BODY_BYTES = 1_000_000  # 1MB cap so a bogus Content-Length can't force huge reads
+
+
+class RateLimiter:
+    """Fixed-size sliding window limiter, keyed by client IP."""
+
+    def __init__(self, max_requests, window_seconds):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self._hits = defaultdict(deque)
+        self._lock = threading.Lock()
+
+    def allow(self, key):
+        now = time.monotonic()
+        with self._lock:
+            hits = self._hits[key]
+            while hits and now - hits[0] > self.window_seconds:
+                hits.popleft()
+            if len(hits) >= self.max_requests:
+                return False
+            hits.append(now)
+            return True
+
+
+rate_limiter = RateLimiter(RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_SECONDS)
+
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith("/api/run/"):
+            if not self.check_rate_limit():
+                return
             self.handle_run(body=None)
         else:
             self.handle_static()
@@ -20,7 +53,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not found"})
             return
 
+        if not self.check_rate_limit():
+            return
+
         length = int(self.headers.get("Content-Length", 0))
+        if length > MAX_BODY_BYTES:
+            self.send_json(413, {"error": "request body too large"})
+            return
         raw = self.rfile.read(length) if length else b""
         body = None
         if raw:
@@ -31,6 +70,19 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
         self.handle_run(body)
+
+    def check_rate_limit(self):
+        client_ip = self.client_address[0]
+        if rate_limiter.allow(client_ip):
+            return True
+        self.send_response(429)
+        self.send_header("Retry-After", str(RATE_LIMIT_WINDOW_SECONDS))
+        body = json.dumps({"error": "too many requests, slow down"}).encode()
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return False
 
     def handle_run(self, body):
         name = self.path.removeprefix("/api/run/")
