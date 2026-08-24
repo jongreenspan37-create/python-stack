@@ -1,6 +1,6 @@
 from scripts.basic import add_numbers, add_phrase, add_strings, string_func
 from scripts.date_manipulation import adjust_date
-from scripts.list_manipulation import count_fruit, upload_fruits
+from scripts.list_manipulation import count_fruit, upload_fruits, prepare_data
 from scripts.health import health
 from scripts.create_tables import create_tables
 from scripts.test import test_1, test_2
@@ -19,6 +19,7 @@ ROUTES = {
     "date_manipulation/adjust_date": adjust_date,
     "list_manipulation/count_fruit": count_fruit,
     "list_manipulation/upload_fruits": upload_fruits,
+    "list_manipulation/prepare_data": prepare_data,
     "health/health": health,
     "create_tables/create_tables": create_tables,
     "test/test_1": test_1,
