@@ -22,37 +22,7 @@ def create_tables(body=None):
         cur.execute(sql_roles)
         cur.execute(sql_users)
 
-        cur.execute("""
-            CREATE OR REPLACE FUNCTION check_roles_row_limit() RETURNS TRIGGER AS $$
-            BEGIN
-                IF (SELECT COUNT(*) FROM roles) >= 3 THEN
-                    RAISE EXCEPTION 'roles table row limit (3) reached';
-                END IF;
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        """)
-        cur.execute("""
-            CREATE TRIGGER roles_row_limit
-            BEFORE INSERT ON roles
-            FOR EACH ROW EXECUTE FUNCTION check_roles_row_limit();
-        """)
-
-        cur.execute("""
-            CREATE OR REPLACE FUNCTION check_users_row_limit() RETURNS TRIGGER AS $$
-            BEGIN
-                IF (SELECT COUNT(*) FROM users) >= 5 THEN
-                    RAISE EXCEPTION 'users table row limit (5) reached';
-                END IF;
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        """)
-        cur.execute("""
-            CREATE TRIGGER users_row_limit
-            BEFORE INSERT ON users
-            FOR EACH ROW EXECUTE FUNCTION check_users_row_limit();
-        """)
+        
 
         conn.commit()
         return {"status": "ok", "message": "User and Role tables have been created"}

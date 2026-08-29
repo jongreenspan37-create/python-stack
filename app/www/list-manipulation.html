@@ -159,34 +159,15 @@
 
     prepareData.addEventListener("click", () => {
       prepareError.textContent = "";
-      fetch("/api/run/list_manipulation/upload_fruits")
+      fetch("/api/run/list_manipulation/prepare_data")
         .then((res) => res.json())
-        .then((fruits) => {
-          if (fruits.error) {
-            prepareError.textContent = fruits.error;
-            return;
-          }
-          return fetch("/api/run/list_manipulation/prepare_data", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(fruits),
-          }).then((res) => res.json());
-        })
         .then((data) => {
-          if (!data) return;
-          if (data.error) {
-            prepareError.textContent = data.error;
-            return;
-          }
           prepareList.textContent = "";
           data.forEach((item) => {
             const li = document.createElement("li");
             li.textContent = item.description;
             prepareList.appendChild(li);
           });
-        })
-        .catch(() => {
-          prepareError.textContent = "Could not prepare data.";
         });
     });
   </script>
