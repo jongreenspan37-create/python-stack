@@ -6,29 +6,29 @@ def upload_fruits(body=None):
     try:
         fruits = _read_fruits()
     except FileNotFoundError:
-        return {"error": "fruits.csv not found"}
+        raise FileNotFoundError("fruits.csv not found")
     if not fruits:
-        return {"error": "no fruits found"}
+        raise ValueError("no fruits found")
     return fruits
 
 
 def count_fruit(body):
-
-    try:
-        target = body
-        fruits = _read_fruits()
-        count = sum(1 for row in fruits if row["fruit"] == target)
-    except FileNotFoundError:
-        return {"error": "fruits.csv not found"}
+    target = body
+    fruits = upload_fruits()
+    count = sum(1 for row in fruits if row["fruit"] == target)
     if count == 0:
         return {"error": f'{target} not found'}
 
     return {"fruit": target, "count": count}
 
-def prepare_data(fruits):
+def prepare_data(body=None):
     prepared =[]
+    fruits= upload_fruits(None)
+    print(fruits)
+
     for fruit in fruits:
         prepared.append({
-            "description":fruit["fruit"] + " is a fruit"
+            "id" : fruit['id'],
+            "description": fruit["fruit"] + " is a sort of fruit"
         })
     return prepared

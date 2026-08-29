@@ -63,7 +63,10 @@ def list_users(body=None):
             "FROM users u LEFT JOIN roles r ON u.role_id = r.id "
             "ORDER BY u.id;"
         )
+        #rows is a tuple 
         rows = cur.fetchall()
+
+        #users ends up a list of dicts
         users = [
             {
                 "id": r[0],
@@ -73,7 +76,7 @@ def list_users(body=None):
                 "roleId": r[4],
                 "roleName": r[5],
             }
-            for r in rows
+            for r in rows #takes a tuple row in rows and makes r a dict which is added to users
         ]
         return {"status": "ok", "users": users}
     except Exception as e:
