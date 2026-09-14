@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F1 Database in Python</title>
+  </head>
+  <body>
+    <h1>F1 database in Python</h1>
+    <button type="button" id="get-first">Get First 10 Drivers</button>
+
+    <div id="result"></div>
+    <table id="first-10">
+      <thead id="thead-first"></thead>
+      <tbody id="tbody-first"></tbody>
+    </table>
+    <br />
+
+    <script>
+      const getFirst = document.getElementById("get-first");
+      const result = document.getElementById("result");
+      const thead = document.getElementById("thead-first");
+      const tbody = document.getElementById("tbody-first");
+      //using await
+      getFirst.addEventListener("click", async () => {
+        try {
+          const res = await fetch("/api/run/crud_drivers/select_drivers_1");
+          if (!res.ok) {
+            console.log("error");
+            throw new Error(`Server responded with ${res.status}`);
+          }
+
+          const data = await res.json();
+
+          result.innerHTML = "";
+
+          /*create row headings dynamically in reality hardcoding with 
+          user friendly names would be better*/
+          const headerRow = document.createElement("tr");
+          const columnName = Object.keys(data[0]);
+          columnName.forEach((key) => {
+            const th = document.createElement("th");
+            th.textContent = key;
+            //append more modern but some older browsers do not recognise
+            headerRow.append(th);
+          });
+          thead.append(headerRow);
+
+          data.forEach((row) => {
+            const tr = document.createElement("tr");
+            //Use Object.values
+            const columnData = Object.values(row);
+            columnData.forEach((value) => {
+              const td = document.createElement("td");
+              td.textContent = value;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        } catch (e) {
+          result.textContent = "Something went wrong: " + e.message;
+        }
+      });
+    </script>
+    <button type="button" id="get-second">Get Second 10 Drivers</button>
+    <table id="second-10">
+      <thead id="thead-second">
+        <th>ID</th>
+        <th>Driver ID</th>
+        <th>Web Page</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Date of Birth</th>
+        <th>Nationality</th>
+      </thead>
+      <tbody id="tbody-second"></tbody>
+    </table>
+    <script>
+      const getSecond = document.getElementById("get-second");
+      const thead2 = document.getElementById("thead-second");
+      const tbody2 = document.getElementById("tbody-second");
+      //using .then
+      getSecond.addEventListener("click", () => {
+        fetch("/api/run/crud_drivers/select_drivers_2")
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.ok) {
+              result.textContent = data.error;
+            }
+            data.forEach((row) => {
+              const tr = document.createElement("tr");
+              //Could use Object.values this is legacy style
+              for (const value in row) {
+                const tdValue = row[value];
+                const td = document.createElement("td");
+                td.textContent = tdValue;
+                tr.appendChild(td);
+              }
+              tbody2.appendChild(tr);
+            });
+          })
+
+          .catch((e) => {
+            result.textContent = "Something went wrong: " + e.message;
+          });
+      });
+    </script>
+  </body>
+</html>

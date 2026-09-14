@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All F1 Tables</title>
+  </head>
+  <body>
+    <button id="create-all">Create and seed all F1 Tables</button>
+    <div id="result"></div>
+    <script>
+      const createAll = document.getElementById("create-all");
+      const result = document.getElementById("result");
+      createAll.addEventListener("click", async () => {
+        try {
+          const res = await fetch(
+            "/api/run/create_and_seed_f1/create_f1_tables",
+          );
+          if (!res.ok) {
+            throw new Error(`Server responded with ${res.status}`);
+          }
+          const data = await res.json();
+          result.textContent = JSON.stringify(data);
+        } catch (e) {
+          result.textContent = "Something went wrong: " + e.message;
+        }
+      });
+    </script>
+  </body>
+</html>
