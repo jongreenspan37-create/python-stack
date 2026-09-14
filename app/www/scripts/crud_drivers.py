@@ -41,14 +41,15 @@ def select_drivers(sql):
         if cur:
             cur.close()
         if conn:
-            conn.closr()
+            conn.close()
 
 def select_drivers_1(body=None):
     sql = """SELECT * FROM drivers ORDER BY id LIMIT 10"""
-    select_drivers(sql)
+    return select_drivers(sql)
+
 
 def select_drivers_2(body=None):
-    sql = """SELECT * FROM drivers ORDER BYY id LIMIT 10 OFFSET 10"""
-    select_drivers(sql)
+    sql = """SELECT * FROM drivers ORDER BY id LIMIT 10 OFFSET 10"""
+    return select_drivers(sql)
      
     

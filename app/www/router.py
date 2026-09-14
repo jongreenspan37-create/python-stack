@@ -7,6 +7,7 @@ from scripts.test import test_1, test_2
 from scripts.role_crud import add_role, list_roles, update_role, delete_role
 from scripts.user_crud import add_user, list_users, update_user, delete_user
 from scripts.crud_drivers import select_drivers_1, select_drivers_2
+from scripts.create_and_seed_f1 import create_f1_tables
 
 # Explicit route table: a request can only ever reach a function listed
 # here. Unlike a getattr()/globals() lookup, a dict can't accidentally
@@ -35,6 +36,7 @@ ROUTES = {
     "user_crud/delete_user": delete_user,
     "crud_drivers/select_drivers_1": select_drivers_1, 
     "crud_drivers/select_drivers_2": select_drivers_2, 
+    "create_and_seed_f1/create_f1_tables": create_f1_tables, 
 
 }
 
