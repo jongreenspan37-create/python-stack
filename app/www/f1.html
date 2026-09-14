@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F1 Database in Python</title>
+  </head>
+  <body>
+    <h1>F1 database in Python</h1>
+    <button type="button" id="get-drivers">Get Drivers</button>
+    <div id="result"></div>
+    <table id="first-10">
+      <thead id="thead-first"></thead>
+      <tbody id="tbody-first"></tbody>
+    </table>
+    <script>
+      const getDrivers = document.getElementById("get-drivers");
+      const result = document.getElementById("result");
+      getDrivers.addEventListener("click", async () => {
+        try {
+          const res = await fetch("/api/run/crud_drivers/select_drivers_1");
+          if (!res.ok) {
+            throw new Error(`Server responded with ${res.status}`);
+          }
+          const data = await res.json();
+
+          result.innerHTML = "";
+
+          data.forEach((row) => {
+            const name = row.given_name;
+            const div = document.createElement("div");
+            div.textContent = name;
+            result.appendChild(div);
+          });
+        } catch {
+          result.textContent = "Something went wrong: " + error.message;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -39,7 +39,7 @@ class RateLimiter:
 rate_limiter = RateLimiter(RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_SECONDS)
 
 
-class Handler(BaseHTTPRequestHandler):
+class Handler(BaseHTTPRequestHandler):#rfile and wfile come from this libary
     def do_GET(self):
         if self.path.startswith("/api/run/"):
             if not self.check_rate_limit():
@@ -114,8 +114,9 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    #this builds the http response and sends back down the pipe created by the caller
     def send_json(self, status, payload):
-        data = json.dumps(payload).encode()
+        data = json.dumps(payload, default=str).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(data)))
