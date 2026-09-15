@@ -30,6 +30,7 @@ def create_f1_tables(body=None):
             conn.commit()
 
             column_names = list(columns.keys())
+            int_columns = {c for c, t in columns.items() if t in ("INTEGER", "SMALLINT")}
             placeholders = ", ".join(["%s"] * len(column_names))
             insert_sql = f"INSERT INTO {table_name} ({', '.join(column_names)}) VALUES ({placeholders})"
 
@@ -38,10 +39,16 @@ def create_f1_tables(body=None):
             with open(csv_path, mode= "r", encoding="utf-8") as file:
                 #csv file path
                 rows = csv.DictReader(file)
-        
+
                 for row in rows:
-                    values = tuple(row[column_name] for column_name in column_names)
-                    cur.execute(insert_sql, values)
+                    values = []
+                    for column_name in column_names:
+                        value = row[column_name] or None
+                        #CSV stores some integer counts as floats (e.g. "1.0")
+                        if value is not None and column_name in int_columns:
+                            value = int(float(value))
+                        values.append(value)
+                    cur.execute(insert_sql, tuple(values))
 
             conn.commit()
                     
