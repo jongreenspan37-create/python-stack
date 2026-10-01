@@ -19,8 +19,11 @@ def create_tables(body=None):
                 "email varchar(50),"
                 "role_id int CONSTRAINT fk_role REFERENCES roles(id)"
                 ");")
+
+        
         cur.execute(sql_roles)
         cur.execute(sql_users)
+        
 
         
 

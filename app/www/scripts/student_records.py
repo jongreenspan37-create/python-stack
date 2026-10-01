@@ -57,16 +57,12 @@ print(f"Courses they share (intersection):     {shared_courses}")
 print(f"Courses only Alice takes (difference): {only_alice}")
 print(f"Courses only Ben takes (difference):   {only_ben}")
 
-#add() and remove()
+#add() and remove() - note add() goes in different order each time
 alice_courses.add("English")
 print(f"Alice's new courses: {alice_courses}")
 
 alice_courses.remove("English")
 print(f"Alice's original courses: {alice_courses}")
-
-
-
-
 
 
 # ----------------------------------
