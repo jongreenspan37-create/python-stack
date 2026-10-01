@@ -4,37 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Basic Scripts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+      corePlugins: { preflight: false },
+      };
+    </script>
     <link rel="stylesheet" href="style.css" />
+    
     <style>
       .result-div {
         margin: 2rem 4rem;
         font-size: large;
       }
     </style>
-    <link src="style.css" />
   </head>
   <body>
     <nav>
-      <a href="index.html">Main Page</a>
-      <a href="list-manipulation.html">List Manipulation</a>
-      <a href="database-interaction.html">Database Interaction</a>
-      <a href="f1_drivers.html">Formula 1</a>
+      <ul>
+      <li><a href="index.html">Main Page</a></li>
+      <li><a href="list-manipulation.html">List Manipulation</a></li>
+      <li><a href="database-interaction.html">Database Interaction</a></li>
+      <li><a href="f1_drivers.html">Formula 1</a></l1>
+      </ul>
     </nav>
 
     <header>
-      <h1>Vanilla HTML/CSS/Javascript - Python - Postgres Stack</h1>
-      <p>
+      <h1 class="text-center text-slate-600">Vanilla HTML/CSS/Javascript - Python - Postgres Stack</h1>
+      <p >
         Each button imports a script in <code>scripts/</code> and calls the
         function matching its name.
       </p>
     </header>
 
     <form id="add-numbers">
-      <input type="number" step="any" name="x" required />
-      <input type="number" step="any" name="y" required />
-      <input type="number" step="any" name="a" required />
-
-      <button type="submit">Add Numbers</button>
+      <div class="flex gap-2">
+        <input class="w-20 h-10 text-xl rounded-lg" type="number" step="any" name="x" required />
+        <input class="w-20 h-10 text-xl rounded-lg" type="number" step="any" name="y" required />
+        <input class="w-20 h-10 text-xl rounded-lg" type="number" step="any" name="a" required />
+      </div>
+      <button class= "mt-2" type="submit">Add Numbers</button>
     </form>
 
     <div class="result-div" id="result-1"></div>
@@ -42,11 +51,12 @@
     <div class="result-div" id="result-3"></div>
 
     <form id="add-strings">
-      <input type="text" maxlength="100" name="a" required />
-      <input type="text" maxlength="100" name="b" required />
-      <input type="text" maxlength="100" name="c" required />
-
-      <button type="submit">Add Words</button>
+      <div class="flex gap-2">
+        <input class="w-32 h-10 text-lg" type="text" maxlength="100" name="a" required />
+        <input class="w-32 h-10 text-lg" type="text" maxlength="100" name="b" required />
+        <input class="w-32 h-10 text-lg" type="text" maxlength="100" name="c" required />
+      </div>
+      <button class="mt-2" type="submit">Add Words</button>
     </form>
 
     <div class="result-div" id="result-error" style="color: red"></div>
@@ -65,14 +75,14 @@
     <form id="date-manipulation">
       <div>
         <label for="date">Pick a date</label>
-        <input type="date" name="date" required />
+        <input class="h-10" type="date" name="date" required />
       </div>
       <label for="number">Add a number and period to give next date due</label>
-      <input type="number" name="amount" required />
-      <select name="unit" required>
-        <option value="day">Day</option>
-        <option value="month">Month</option>
-        <option value="year">Year</option>
+      <input class="h-10" type="number" name="amount" required />
+      <select  class="h-10" name="unit" required>
+        <option value="day">Day(s)</option>
+        <option value="month">Month(s)</option>
+        <option value="year">Year(s)</option>
       </select>
 
       <button type="submit">Next Date</button>

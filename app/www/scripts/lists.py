@@ -24,3 +24,12 @@ print(complexdict[2][1])
 listdict=[{'one':1,'two':2,'three':3},{'four':4,'five':5,'six':6}]
 print(listdict[1]['five'])
 
+
+dataexample= [
+    {'table':'users','columns':['id','LastName','FirstName','email','role_id']},
+    {'table':'Roles','columns':['id','name']} 
+     ]
+
+for t in dataexample:
+    print(t['table'])
+    print(t['columns'])
