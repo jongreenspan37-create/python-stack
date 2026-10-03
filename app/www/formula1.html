@@ -4,9 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1 Database in Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+      };
+    </script>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .result-div {
+        margin: 2rem 4rem;
+        font-size: large;
+      }
+    </style>
   </head>
   <body>
+    <nav>
+      <ul>
+      <li><a href="index.html">Main Page</a></li>
+      <li><a href="list-manipulation.html">List Manipulation</a></li>
+      <li><a href="database-interaction.html">Database Interaction</a></li>
+      <li><a href="formula1.html">Formula 1</a></l1>
+      </ul>
+    </nav>
     <h1>F1 database in Python</h1>
+    <button data-script="create_tables/create_f1_tables">
+      Create F1 Tables
+    </button>
+    <button type="button" id="more_tables"><a href="f1tables.html">More Tables</a></button>
     <button type="button" id="get-first">Get First 10 Drivers</button>
 
     <div id="result"></div>
@@ -15,22 +41,44 @@
       <tbody id="tbody-first"></tbody>
     </table>
     <br />
-
+    
+    
     <script>
-      const getFirst = document.getElementById("get-first");
-      const result = document.getElementById("result");
-      const thead = document.getElementById("thead-first");
-      const tbody = document.getElementById("tbody-first");
+
+      //picks up any button whicj is clicked with a data-script atrribute and runs the script with that name via the /api/run/<script_name> endpoint
+  document.querySelectorAll("button[data-script]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const name = button.dataset.script;
+    result.textContent = `Running ${name}...`;
+    try {
+      const res = await fetch(`/api/run/${name}`);
+
+      const data = await res.json();
+
+      result.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      result.textContent = `Request failed: ${err}`;
+    }
+  });
+});
+      
+
+
+const getFirst = document.getElementById("get-first");
+const result = document.getElementById("result");
+const thead = document.getElementById("thead-first");
+const tbody = document.getElementById("tbody-first");
       //using await
-      getFirst.addEventListener("click", async () => {
+getFirst.addEventListener("click", async () => {
         try {
           const res = await fetch("/api/run/crud_drivers/select_drivers_1");
           if (!res.ok) {
-            console.log("error");
-            throw new Error(`Server responded with ${res.status}`);
+            const errorText = await res.text();
+            throw new Error(`Server responded with ${res.status}: ${errorText}`);
           }
 
           const data = await res.json();
+          console.log("data", data);
 
           result.innerHTML = "";
 
@@ -38,9 +86,11 @@
           user friendly names would be better*/
           const headerRow = document.createElement("tr");
           const columnName = Object.keys(data[0]);
+          console.log("columnName", columnName);
           columnName.forEach((key) => {
             const th = document.createElement("th");
             th.textContent = key;
+            console.log("th", th);
             //append more modern but some older browsers do not recognise
             headerRow.append(th);
           });
@@ -65,7 +115,7 @@
     <button type="button" id="get-second">Get Second 10 Drivers</button>
     <table id="second-10">
       <thead id="thead-second">
-        <th>ID</th>
+        
         <th>Driver ID</th>
         <th>Web Page</th>
         <th>First Name</th>
@@ -101,7 +151,7 @@
           })
 
           .catch((e) => {
-            result.textContent = "Something went wrong: " + e.message;
+            result.textContent = "Something  wrong: " + e.message;
           });
       });
     </script>
