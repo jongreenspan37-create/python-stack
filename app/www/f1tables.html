@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All F1 Tables</title>
+  </head>
+  <body>
+    <nav>
+      <ul>
+      <li><a href="index.html">Main Page</a></li>
+      <li><a href="list-manipulation.html">List Manipulation</a></li>
+      <li><a href="database-interaction.html">Database Interaction</a></li>
+      <li><a href="formula1.html">Formula 1</a></l1>
+      </ul>
+    </nav>
+    <select id="query-select">
+      <option value="">Select a query</option>
+    </select>
+    <p id="query-description"></p>
+
+    <script>
+      // Fetch the list of queries from the server
+      
+      async function loadOptions() {
+        
+      try{
+        const response = await fetch("/api/run/crud_f1/get_select_options");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        } 
+
+        const options = await response.json();
+        
+        const select = document.getElementById("query-select");
+        
+        options.forEach((item) => {
+          const opt = document.createElement("option");
+          opt.value = item.index;
+          opt.textContent = item.title;
+          select.appendChild(opt);
+          })
+        }catch (error) {
+          console.error("Error fetching options:", error);
+        }
+      }
+      
+      loadOptions();
+          
+
+         
+    </script>
+      
+    
+  </body>
+</html>

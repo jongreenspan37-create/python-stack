@@ -27,9 +27,22 @@ print(listdict[1]['five'])
 
 dataexample= [
     {'table':'users','columns':['id','LastName','FirstName','email','role_id']},
-    {'table':'Roles','columns':['id','name']} 
+    {'table':'roles','columns':['id','name']} 
      ]
 
 for t in dataexample:
     print(t['table'])
-    print(t['columns'])
+    for c in t['columns']:
+        print(c)
+
+schema = {
+    'users' :{
+        'columns': ['id','LastName','FirstName','email','role_id'],
+        'foreign_keys': {'role_id':'roles.id'}
+    },   
+
+    'roles' :{
+        'columns': ['id','name'],
+        'foreign_keys': {},
+    },
+}

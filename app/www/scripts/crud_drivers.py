@@ -21,12 +21,12 @@ def select_drivers(sql):
         #but this ensures gets set as a string
         result = [
         {
-            "id": row["id"],
-            "driverId": row["driver_id"],
+            
+            "driverId": row["driverid"],
             "url": row["url"],
-            "firstName": row["given_name"],
-            "lastName": row["family_name"],
-            "dateOfBirth": str(row["date_of_birth"]),
+            "firstName": row["givenname"],
+            "lastName": row["familyname"],
+            "dateOfBirth": str(row["dateofbirth"]),
             "nationality": row["nationality"],
         }
         for row in rows
@@ -44,12 +44,18 @@ def select_drivers(sql):
             conn.close()
 
 def select_drivers_1(body=None):
-    sql = """SELECT * FROM drivers ORDER BY id LIMIT 10"""
-    return select_drivers(sql)
+    sql = "SELECT * FROM drivers ORDER BY id LIMIT 10"
+    conn = get_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(sql)
+            return cur.fetchall()
+    finally:
+        conn.close()
 
 
 def select_drivers_2(body=None):
-    sql = """SELECT * FROM drivers ORDER BY id LIMIT 10 OFFSET 10"""
+    sql = """SELECT * FROM drivers ORDER BY driverid LIMIT 10 OFFSET 10"""
     return select_drivers(sql)
      
     

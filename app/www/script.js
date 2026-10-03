@@ -1,5 +1,6 @@
 const result = document.getElementById("result");
 
+//utility to prevent xss by escaping html special characters
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -9,6 +10,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+//picks up any button whicj is clicked with a data-script atrribute and runs the script with that name via the /api/run/<script_name> endpoint
 document.querySelectorAll("button[data-script]").forEach((button) => {
   button.addEventListener("click", async () => {
     const name = button.dataset.script;
@@ -24,6 +26,8 @@ document.querySelectorAll("button[data-script]").forEach((button) => {
     }
   });
 });
+
+//utility to call a script via the /api/run/<script_name> endpoint with optional json body
 
 async function callScript(name, body) {
   const options = body
@@ -45,6 +49,7 @@ const cancelRoleEdit = document.getElementById("cancel-role-edit");
 
 const userRoleSelect = document.getElementById("user-role-select");
 
+// Populate the role select dropdown for users
 function populateRoleOptions(roles) {
   const previousValue = userRoleSelect.value;
   userRoleSelect.innerHTML = '<option value="">-- No role --</option>';
@@ -57,6 +62,7 @@ function populateRoleOptions(roles) {
   userRoleSelect.value = previousValue;
 }
 
+// Load roles from the backend and populate the roles table
 async function loadRoles() {
   const data = await callScript("role_crud/list_roles");
   if (data.status !== "ok") return;
@@ -68,8 +74,8 @@ async function loadRoles() {
       <td>${escapeHtml(role.id)}</td>
       <td>${escapeHtml(role.name)}</td>
       <td>
-        <button type="button" data-action="edit-role" data-id="${escapeHtml(role.id)}" data-name="${escapeHtml(role.name)}">Edit</button>
-        <button type="button" data-action="delete-role" data-id="${escapeHtml(role.id)}">Delete</button>
+        <button type="button" class="tbl-button" data-action="edit-role" data-id="${escapeHtml(role.id)}" data-name="${escapeHtml(role.name)}">Edit</button>
+        <button type="button" class="tbl-button" data-action="delete-role" data-id="${escapeHtml(role.id)}">Delete</button>
       </td>
     `;
     rolesTableBody.appendChild(row);
@@ -153,8 +159,8 @@ async function loadUsers() {
       <td>${escapeHtml(user.email)}</td>
       <td>${escapeHtml(user.roleName ?? "")}</td>
       <td>
-        <button type="button" data-action="edit-user" data-id="${escapeHtml(user.id)}" data-first-name="${escapeHtml(user.firstName)}" data-last-name="${escapeHtml(user.lastName)}" data-email="${escapeHtml(user.email)}" data-role-id="${escapeHtml(user.roleId ?? "")}">Edit</button>
-        <button type="button" data-action="delete-user" data-id="${escapeHtml(user.id)}">Delete</button>
+        <button type="button" class="tbl-button" data-action="edit-user" data-id="${escapeHtml(user.id)}" data-first-name="${escapeHtml(user.firstName)}" data-last-name="${escapeHtml(user.lastName)}" data-email="${escapeHtml(user.email)}" data-role-id="${escapeHtml(user.roleId ?? "")}">Edit</button>
+        <button type="button" class="tbl-button" data-action="delete-user" data-id="${escapeHtml(user.id)}">Delete</button>
       </td>
     `;
     usersTableBody.appendChild(row);
