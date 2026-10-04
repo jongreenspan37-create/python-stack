@@ -1,3 +1,4 @@
+# Practice: create and seed just the drivers table. Not used by router.py.
 import sys
 from pathlib import Path
 import csv

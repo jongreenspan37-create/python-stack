@@ -1,3 +1,4 @@
+# Practice: describing tables as data (a dict of columns). Not used by router.py.
 
 database_tables = {
     "roles": {

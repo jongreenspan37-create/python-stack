@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Basic Scripts</title>
+    <!-- Tailwind CSS from a CDN: utility classes like "flex gap-2" style elements directly in the HTML. -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- preflight: false stops Tailwind resetting the browser's default styles, so style.css still applies. -->
     <script>
       tailwind.config = {
       corePlugins: { preflight: false },
@@ -25,7 +27,7 @@
       <li><a href="index.html">Main Page</a></li>
       <li><a href="list-manipulation.html">List Manipulation</a></li>
       <li><a href="database-interaction.html">Database Interaction</a></li>
-      <li><a href="formula1.html">Formula 1</a></l1>
+      <li><a href="formula1.html">Formula 1</a></li>
       </ul>
     </nav>
 
@@ -37,6 +39,8 @@
       </p>
     </header>
 
+    <!-- Each form below is handled by the JavaScript at the bottom of the page:
+         it sends the values to /api/run/<file>/<function> and shows the JSON reply. -->
     <form id="add-numbers">
       <div class="flex gap-2">
         <input class="w-20 h-10 text-xl rounded-lg" type="number" step="any" name="x" required />
@@ -46,6 +50,7 @@
       <button class= "mt-2" type="submit">Add Numbers</button>
     </form>
 
+    <!-- Empty boxes that the JavaScript fills in with results. -->
     <div class="result-div" id="result-1"></div>
     <div class="result-div" id="result-2"></div>
     <div class="result-div" id="result-3"></div>
@@ -64,6 +69,7 @@
     <div class="result-div" id="string-result"></div>
 
     <div class="result-div">
+      <!-- data-script isn't used here (script.js isn't loaded on this page); the click handler below does the work. -->
       <button id="add-phrase" data-script="basic/add_phrase">
         Add a phrase
       </button>
@@ -96,13 +102,16 @@
     <div class="result-div" id="date-manipulation-result"></div>
 
     <script>
+      // document.getElementById finds an element by its id="..." attribute.
       const addNumbers = document.getElementById("add-numbers");
       const resultError = document.getElementById("result-error");
       const result1 = document.getElementById("result-1");
       const result2 = document.getElementById("result-2");
       const result3 = document.getElementById("result-3");
 
+      // Runs when the form is submitted. (e) => { ... } is an arrow function.
       addNumbers.addEventListener("submit", (e) => {
+        // Stop the browser's normal form submit (which would reload the page).
         e.preventDefault();
         const form = e.target;
         resultError.textContent = "";
@@ -110,6 +119,7 @@
         result2.textContent = "";
         result3.textContent = "";
 
+        // form.x is the <input name="x">. Inputs always give text, so convert to a number.
         const x = Number(form.x.value);
         const y = Number(form.y.value);
         const a = Number(form.a.value);
@@ -121,17 +131,22 @@
           return;
         }
 
+        // Send the numbers to the server as JSON. fetch returns a Promise; each
+        // .then() runs when the previous step finishes.
         fetch("/api/run/basic/add_numbers", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ x, y, a }),
         })
+          // Parse the response body as JSON.
           .then((res) => res.json())
           .then((data) => {
+            // The server returns {"error": ...} when the input is invalid.
             if (data.error) {
               resultError.textContent = data.error;
               return;
             }
+            // Success returns an array: [sum, "true"/"false"].
             result1.textContent = "Result = " + data[0];
             result2.textContent =
               "Raw result = " +
@@ -187,6 +202,7 @@
       const displayPhrase = document.getElementById("display-phrase");
       const displaySlice = document.getElementById("slice");
 
+      // Two requests in a row: get the phrase, then send it to string_func.
       addPhrase.addEventListener("click", () => {
         displayPhrase.textContent = "Fetching ....";
         fetch("/api/run/basic/add_phrase")
@@ -197,6 +213,7 @@
 
             if (phrase) {
               console.log(phrase);
+              // Returning the second fetch chains it onto the first.
               return fetch("/api/run/basic/string_func", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -216,6 +233,8 @@
           });
       });
 
+      // Turns "2024-02-29" into "29 February 2024". The "T00:00:00Z" + timeZone UTC
+      // stop the date shifting by a day in some time zones.
       function formatHumanDate(isoDate) {
         const date = new Date(isoDate + "T00:00:00Z");
         return date.toLocaleDateString("en-GB", {
@@ -234,6 +253,7 @@
         "date-manipulation-result",
       );
 
+      // Sends {date, amount, unit} to adjust_date and shows the new date.
       dateManipulation.addEventListener("submit", (e) => {
         e.preventDefault();
         const form = e.target;

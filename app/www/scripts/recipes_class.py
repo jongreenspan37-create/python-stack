@@ -1,3 +1,4 @@
+# Practice: the recipe menu again, using a Recipe class. Run directly; not an API endpoint.
 recipes = []
 
 class Recipe:

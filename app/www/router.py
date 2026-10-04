@@ -1,3 +1,6 @@
+# Maps API names like "basic/add_numbers" to the Python function that handles them.
+# FastAPI comparison: this is your @app.post("/...") decorators, written as one dict.
+# To add an endpoint: write the function in scripts/, import it here, add it to ROUTES.
 from scripts.basic import add_numbers, add_phrase, add_strings, string_func
 from scripts.date_manipulation import adjust_date
 from scripts.list_manipulation import count_fruit, upload_fruits, prepare_data
@@ -7,7 +10,7 @@ from scripts.test import test_1, test_2
 from scripts.role_crud import add_role, list_roles, update_role, delete_role
 from scripts.user_crud import add_user, list_users, update_user, delete_user
 from scripts.crud_drivers import select_drivers_1, select_drivers_2
-from scripts.crud_f1 import get_select_options
+from scripts.crud_f1 import get_select_options, get_query_by_index
 
 
 # Explicit route table: a request can only ever reach a function listed
@@ -38,11 +41,14 @@ ROUTES = {
     "crud_drivers/select_drivers_1": select_drivers_1, 
     "crud_drivers/select_drivers_2": select_drivers_2, 
     "create_tables/create_f1_tables": create_f1_tables, 
-    "crud_f1/get_select_options": get_select_options,
+    "crud_f1/get_select_options": get_select_options, 
+    "crud_f1/get_query_by_index": get_query_by_index, 
 
 }
 
 
+# Called by app.py for every /api/run/ request.
+# Raises ValueError for unknown names, which app.py turns into a 500 error.
 def run_script(name, body):
     func = ROUTES.get(name)
     if func is None:

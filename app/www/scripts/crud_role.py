@@ -1,3 +1,4 @@
+# Older version of role_crud.py with open/close helpers. Not used by router.py.
 from connection import get_connection
 
 MAX_FIELD_LENGTH = 25

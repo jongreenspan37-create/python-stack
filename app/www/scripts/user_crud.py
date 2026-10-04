@@ -1,5 +1,9 @@
+# CRUD for the users table, called from the users form/table in script.js.
+# Same pattern as role_crud.py. The page uses camelCase (firstName); the table
+# uses FirstName, so the functions translate between the two.
 from connection import get_connection
 
+# Maximum length per field, matching the column sizes in create_tables.py.
 MAX_FIELD_LENGTHS = {
     "firstName": 25,
     "lastName": 25,
@@ -7,6 +11,8 @@ MAX_FIELD_LENGTHS = {
 }
 
 
+# Returns an error message for the first field that's too long, otherwise None.
+# **fields collects keyword arguments into a dict: firstName="Jo" -> {"firstName": "Jo"}.
 def _check_field_lengths(**fields):
     for label, value in fields.items():
         max_length = MAX_FIELD_LENGTHS[label]
@@ -15,6 +21,7 @@ def _check_field_lengths(**fields):
     return None
 
 
+# Inserts a user. Body: {"firstName", "lastName", "email", "roleId" (optional)}
 def add_user(body):
     if not body:
         return {"status": "error", "detail": "missing request body"}
@@ -22,6 +29,7 @@ def add_user(body):
     first_name = body.get("firstName")
     last_name = body.get("lastName")
     email = body.get("email")
+    # `or None` turns "" (no role picked) into None, which is stored as NULL.
     role_id = body.get("roleId") or None
 
     if not first_name or not last_name or not email:
@@ -40,6 +48,7 @@ def add_user(body):
             "INSERT INTO users (FirstName, LastName, email, role_id) VALUES (%s, %s, %s, %s) RETURNING id;",
             (first_name, last_name, email, role_id),
         )
+        # RETURNING id makes the INSERT hand back the new SERIAL id.
         new_id = cur.fetchone()[0]
         conn.commit()
         return {"status": "ok", "id": new_id}
@@ -52,6 +61,7 @@ def add_user(body):
             conn.close()
 
 
+# Returns every user with their role name. LEFT JOIN keeps users with no role.
 def list_users(body=None):
     conn = None
     cur = None
@@ -88,6 +98,7 @@ def list_users(body=None):
             conn.close()
 
 
+# Updates every field of one user. Body: same as add_user plus "id".
 def update_user(body):
     if not body:
         return {"status": "error", "detail": "missing request body"}
@@ -125,6 +136,7 @@ def update_user(body):
             conn.close()
 
 
+# Deletes one user. Body: {"id": ..}
 def delete_user(body):
     if not body:
         return {"status": "error", "detail": "missing request body"}

@@ -1,3 +1,4 @@
+# Practice: running SQL directly with psycopg2. Not used by router.py.
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor

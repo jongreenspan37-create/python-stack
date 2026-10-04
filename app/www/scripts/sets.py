@@ -1,3 +1,4 @@
+# Practice: Python sets (union, intersection, difference). Run directly; not an API endpoint.
 set1={1,2,3}
 set2={3,4,5}
 set3=set1.union(set2)

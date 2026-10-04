@@ -1,3 +1,4 @@
+# Practice: Python lists (append, nesting, indexing). Run directly; not an API endpoint.
 mylist =[1,2,3]
 print(mylist)
 mylist.append(4)

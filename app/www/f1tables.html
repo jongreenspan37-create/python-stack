@@ -4,53 +4,132 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>All F1 Tables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+      };
+    </script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <nav>
       <ul>
-      <li><a href="index.html">Main Page</a></li>
-      <li><a href="list-manipulation.html">List Manipulation</a></li>
-      <li><a href="database-interaction.html">Database Interaction</a></li>
-      <li><a href="formula1.html">Formula 1</a></l1>
+        <li><a href="index.html">Main Page</a></li>
+        <li><a href="list-manipulation.html">List Manipulation</a></li>
+        <li><a href="database-interaction.html">Database Interaction</a></li>
+        <li><a href="formula1.html">Formula 1</a></li>
       </ul>
     </nav>
-    <select id="query-select">
-      <option value="">Select a query</option>
+    <!-- Filled with one <option> per practice query when the page loads. -->
+    <select class="mt-2 p-2 h-12 w-full text-xl" id="query-select">
+      <option class="p2 text-xl" value="">Select a query</option>
     </select>
     <p id="query-description"></p>
+    <div class="overflow-x-auto">
+      <table
+        class="mt-4 w-full border-collapse border border-gray-300"
+        id="query-table"
+      >
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
 
     <script>
-      // Fetch the list of queries from the server
-      
+      // Get Select element as a constant
+      const select = document.getElementById("query-select");
+      // Fetch the list of queries from the server to poulate dropdown
       async function loadOptions() {
-        
-      try{
-        const response = await fetch("/api/run/crud_f1/get_select_options");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        } 
+        try {
+          const response = await fetch("/api/run/crud_f1/get_select_options");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
 
-        const options = await response.json();
-        
-        const select = document.getElementById("query-select");
-        
-        options.forEach((item) => {
-          const opt = document.createElement("option");
-          opt.value = item.index;
-          opt.textContent = item.title;
-          select.appendChild(opt);
-          })
-        }catch (error) {
+          const options = await response.json();
+
+          options.forEach((item) => {
+            const opt = document.createElement("option");
+            // The option's value is the query's index; only that is sent back, never SQL.
+            opt.value = item.index;
+            opt.textContent = item.title;
+            select.appendChild(opt);
+          });
+        } catch (error) {
           console.error("Error fetching options:", error);
         }
       }
-      
-      loadOptions();
-          
 
-         
+      loadOptions();
+
+      // When a query is chosen: clear the table, run the query, rebuild the table.
+      select.addEventListener("change", async (event) => {
+        const thead = document.getElementById("thead");
+        const tbody = document.getElementById("tbody");
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        const selectedIndex = event.target.value;
+        const descriptionElement = document.getElementById("query-description");
+
+        if (selectedIndex) {
+          try {
+            const response = await fetch(
+              "/api/run/crud_f1/get_query_by_index",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                // The <select> value is text; parseInt makes it a number, as the server expects.
+                body: JSON.stringify({ index: parseInt(selectedIndex) }),
+              },
+            );
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.error) {
+              descriptionElement.textContent = data.error;
+              return;
+            }
+            if (data.length === 0) {
+              descriptionElement.textContent = "No rows returned.";
+              return;
+            }
+            descriptionElement.textContent = "";
+            //Create headings dynamically
+            const headerRow = document.createElement("tr");
+            const columnName = Object.keys(data[0]);
+            console.log("columnName", columnName);
+            columnName.forEach((key) => {
+              const th = document.createElement("th");
+              th.textContent = key;
+              console.log("th", th);
+              //append more modern but some older browsers do not recognise
+              headerRow.append(th);
+            });
+            thead.append(headerRow);
+            //Create table body dynamically
+            data.forEach((row) => {
+              const tr = document.createElement("tr");
+              //Use Object.values
+              const columnData = Object.values(row);
+              columnData.forEach((value) => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+          } catch (error) {
+            console.error("Error fetching query description:", error);
+            descriptionElement.textContent =
+              "Error fetching query description.";
+          }
+        } else {
+          descriptionElement.textContent = "";
+        }
+      });
     </script>
-      
-    
   </body>
 </html>

@@ -1,3 +1,5 @@
+# The F1 table definitions: table name -> {column name: PostgreSQL type}.
+# Column names must match the CSV headers in csv/formula_1/ (create_f1_tables reads by name).
 f1_tables = {
     "constructor_standings": {
         "season": "INTEGER",

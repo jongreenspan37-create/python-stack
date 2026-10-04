@@ -26,11 +26,12 @@
       <li><a href="index.html">Main Page</a></li>
       <li><a href="list-manipulation.html">List Manipulation</a></li>
       <li><a href="database-interaction.html">Database Interaction</a></li>
-      <li><a href="formula1.html">Formula 1</a></l1>
+      <li><a href="formula1.html">Formula 1</a></li>
       </ul>
     </nav>
     <h1>List manipulation</h1>
 
+    <!-- Two ways to show the same fruit list: a <ul> and a <table>. -->
     <div class="div1">
       <div>
         <div>
@@ -54,6 +55,7 @@
       </div>
 
       <div>
+        <!-- Count how many times one fruit appears in the CSV. -->
         <form id="count-fruit">
           <input type="text" name="fruit" placeholder="e.g. melon" required />
 
@@ -66,6 +68,7 @@
 
     <div>
       <div>
+        <!-- Shows a new list built on the server from the fruits. -->
         <button type="button" id="prepare-data">Prepare Data</button>
       </div>
       <div class="result-div" id="prepare-error" style="color: red"></div>
@@ -89,13 +92,17 @@
             fruitError.textContent = data.error;
             return;
           }
+          // Clear the old list first so clicking twice doesn't duplicate it.
           fruitList.textContent = "";
           data.forEach((fruitItem) => {
+            // Create a new <li>, set its text, and add it to the list.
+            // textContent (not innerHTML) treats the data as plain text, so it can't inject HTML.
             const li = document.createElement("li");
             li.textContent = `${fruitItem.id} - ${fruitItem.fruit};`;
             fruitList.appendChild(li);
           });
         })
+        // .catch runs if the request fails or the reply isn't valid JSON.
         .catch(() => {
           fruitError.textContent = "Could not load fruits.";
         });
@@ -112,6 +119,7 @@
             return;
           }
           fruitTableBody.textContent = "";
+          // .map() turns each fruit object into a <tr> element, giving a new array of rows.
           const rows = data.map((fruitItem) => {
             const tr = document.createElement("tr");
 
@@ -124,6 +132,7 @@
             tr.append(idCell, fruitCell);
             return tr;
           });
+          // ...rows spreads the array, so append() gets every row as a separate argument.
           fruitTableBody.append(...rows);
         })
         .catch(() => {
@@ -152,6 +161,7 @@
       fetch("/api/run/list_manipulation/count_fruit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // The body is just a JSON string, e.g. "apple" (not an object).
         body: JSON.stringify(fruit),
       })
         .then((res) => res.json())

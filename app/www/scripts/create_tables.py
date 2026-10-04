@@ -1,13 +1,18 @@
 
+# Creates the database tables: roles/users for the CRUD exercise, and the F1 tables.
 import sys
 from pathlib import Path
 import csv
 from scripts.f1_schema import f1_tables
 
+# Add www/ to the import path so `from connection import ...` works even when
+# this file is run directly (python3 scripts/create_tables.py).
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from connection import get_connection
 
 
+# Creates the roles and users tables. Plain CREATE TABLE errors if they already
+# exist (the error is returned as JSON).
 def create_tables(body=None):
     conn = None
     cur = None
@@ -15,10 +20,12 @@ def create_tables(body=None):
         conn = get_connection()
         cur = conn.cursor()
 
+        # Strings side by side inside ( ) are joined automatically into one string.
         sql_roles = ("CREATE TABLE roles ("
                      "id int PRIMARY KEY,"
                      "name varchar(25)"
                      ");")
+        # SERIAL = auto-incrementing id. role_id must match a roles.id (foreign key).
         sql_users = ("CREATE TABLE users ( "
                 "id SERIAL PRIMARY KEY,"
                 "LastName varchar(25),"
@@ -46,6 +53,7 @@ def create_tables(body=None):
         if conn is not None:
             conn.close()
 
+# Creates each F1 table from f1_schema.py and loads its rows from csv/formula_1/.
 def create_f1_tables(body=None):
     try:
         conn = None
@@ -69,7 +77,9 @@ def create_f1_tables(body=None):
             conn.commit()
 
             column_names = list(columns.keys())
+            # A set of the integer column names, so values can be converted below.
             int_columns = {c for c, t in columns.items() if t in ("INTEGER", "SMALLINT")}
+            # One %s per column, e.g. "%s, %s, %s".
             placeholders = ", ".join(["%s"] * len(column_names))
             insert_sql = f"INSERT INTO {table_name} ({', '.join(column_names)}) VALUES ({placeholders})"
 
@@ -82,6 +92,7 @@ def create_f1_tables(body=None):
                 for row in rows:
                     values = []
                     for column_name in column_names:
+                        # Empty CSV cells ("") are stored as NULL.
                         value = row[column_name] or None
                         #CSV stores some integer counts as floats (e.g. "1.0")
                         if value is not None and column_name in int_columns:

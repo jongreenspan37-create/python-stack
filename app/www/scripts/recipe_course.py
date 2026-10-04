@@ -1,3 +1,4 @@
+# Practice: a terminal recipe menu using a list of dicts. Run directly; not an API endpoint.
 recipes = []
 
 def menu_func():

@@ -1,3 +1,4 @@
+# Earlier standalone version of create_f1_tables(). Not used by router.py.
 import sys
 from pathlib import Path
 import csv
